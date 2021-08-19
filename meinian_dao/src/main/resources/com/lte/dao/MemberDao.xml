@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.MemberDao">
+     <!--根据电话号码查询会员信息-->
+<select id="findByTelephone" parameterType="string" resultType="member">
+     select * from t_member where phoneNumber = #{telephone}
+
+</select>
+     <!--新增数据-->
+<insert id="add" parameterType="member"  useGeneratedKeys="true" keyProperty="id">
+      insert into  t_member(fileNumber,name,sex,idCard,phoneNumber,regTime,password,email,birthday,remark)
+      values(#{fileNumber},#{name},#{sex},#{idCard},#{phoneNumber},#{regTime},#{password},#{email},#{birthday},#{remark})
+</insert>
+<!--获取某个日期之前所有的会员数量-->
+<select id="findMemberCountByMonth" resultType="integer" parameterType="string">
+    SELECT COUNT(*) FROM t_member WHERE regTime &lt;= #{value}
+
+</select>
+    <!--获取今天新增会员数-->
+    <select id="getTodayNewMember" parameterType="string" resultType="integer">
+        SELECT COUNT(*) FROM t_member WHERE regTime = #{today}
+    </select>
+
+    <!--获取会员总数-->
+    <select id="getTotalMember" resultType="integer">
+        SELECT COUNT(*) FROM t_member
+    </select>
+
+    <!--本周新增会员数-->
+    <select id="getThisWeekAndMonthNewMember" parameterType="string" resultType="integer">
+        select count(*) from t_member where regTime &gt;= #{value}
+
+    </select>
+
+</mapper>

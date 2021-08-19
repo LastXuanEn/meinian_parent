@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.TravelItemDao">
+    <!--新增-->
+    <insert id="add" parameterType="travelItem">
+        insert into t_travelitem(code,name,sex,age,price,type,remark,attention)
+        values
+        (#{code},#{name},#{sex},#{age},#{price},#{type},#{remark},#{attention})
+    </insert>
+    <update id="edit" parameterType="travelItem">
+        update t_travelitem
+        <set>
+
+            <if test="code!=null and code.length>0">
+                code=#{code},
+            </if>
+            <if test="name!=null and name.length>0">
+                name=#{name},
+            </if>
+            <if test="sex!=null and sex.length>0">
+                sex=#{sex},
+            </if>
+            <if test="age!=null and age.length>0">
+                age=#{age},
+            </if>
+            <if test="price!=null">
+                price=#{price},
+            </if>
+            <if test="type!=null and type.length>0">
+                type=#{type},
+            </if>
+            <if test="remark!=null and remark.length>0">
+                remark=#{remark},
+            </if>
+            <if test="attention!=null and attention.length>0">
+            attention=#{attention},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="integer">
+        delete from t_travelitem
+        where id = #{id}
+
+    </delete>
+
+    <select id="findPage" resultType="travelItem" parameterType="string">/*/获取简单参数必须是value*/
+        select * from t_travelitem
+        <where>
+            <if test="value != null and value.length > 0">
+                code = #{value} or name like concat("%",#{value},"%")
+            </if>
+        </where>
+    </select>
+    <select id="getById" resultType="travelItem" parameterType="integer">
+        select * from t_travelitem
+        where id = #{id}
+    </select>
+
+    <select id="findAll" resultType="travelItem" >
+        select * from t_travelitem
+    </select>
+    <!--根据抱团游查询自由行-->
+    <select id="findTravelItemListById" resultType="travelItem" parameterType="integer">
+    select * from t_travelitem where id in (select travelitem_id from t_travelgroup_travelitem where travelgroup_id=#{id})
+    </select>
+
+</mapper>
+
+

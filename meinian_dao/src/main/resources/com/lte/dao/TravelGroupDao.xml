@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.TravelGroupDao">
+    <!--添加自由行单条数据-->
+    <insert id="add" parameterType="travelGroup" keyProperty="id" useGeneratedKeys="true">
+        /*将生成的主键值封装到travelGroup中的id属性中*/
+        insert into t_travelgroup(code, name, helpCode, sex, remark, attention)
+        values (#{code},#{name},#{helpCode},
+       #{sex},#{remark},#{attention})
+    </insert>
+
+    <!--向跟团游和自由行的中间表插入对应ID-->
+    <insert id="setTravelGroupAndTravelItem" parameterType="map">
+        insert into t_travelgroup_travelitem(travelgroup_id,travelitem_id)
+        value (#{travelGroup},#{travelItem})
+    </insert>
+
+    <!--动态查询自由行数据-->
+    <select id="findPage" parameterType="string" resultType="travelGroup">
+        select * from t_travelgroup
+        <where>
+            <if test="value != null and value.length>0">
+                code = #{value} or name like concat("%",#{value},"%")
+                or helpCode=#{value}
+            </if>
+        </where>
+    </select>
+    <!--删除自由行的中间表数据-->
+    <delete id="deleteMidTable" parameterType="integer" >
+        delete from  t_travelgroup_travelitem
+        where travelgroup_id = #{id}
+    </delete>
+    <!--删除被引用表的数据-->
+    <delete id="delete" parameterType="integer" >
+        delete from t_travelgroup
+        where id = #{id}
+    </delete>
+
+    <!--根据ID查询抱团游的一条数据-->
+    <select id="findById" parameterType="integer" resultType="travelGroup">
+        select * from t_travelgroup
+        where id = #{id}
+    </select>
+    <!--根据抱团游ID去中间表查询对应的自由行IDS-->
+    <select id="findTravelItemIdByTravelGroupId" parameterType="integer" resultType="integer">
+        select travelitem_id from t_travelgroup_travelitem
+        where travelgroup_id = #{id}
+    </select>
+
+    <!--编辑跟团游-->
+    <!--编辑跟团游-->
+    <update id="edit" parameterType="travelGroup">
+        update t_travelgroup
+        <set>
+            <if test="code!=null and code.length>0">
+                code = #{code},
+            </if>
+            <if test="name!=null and name.length>0">
+                name = #{name},
+            </if>
+            <if test="helpCode!=null and helpCode.length>0">
+                helpCode = #{helpCode},
+            </if>
+            <if test="sex!=null and sex.length>0">
+                sex = #{sex},
+            </if>
+            <if test="remark!=null and remark.length>0">
+                remark = #{remark},
+            </if>
+            <if test="attention!=null and attention.length>0">
+                attention = #{attention},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="findAll" resultType="travelGroup">
+        select * from t_travelgroup
+    </select>
+
+    <!--根据groupID查询中间表存在的数量-->
+    <select id="findCountMidTableById" parameterType="integer" resultType="long">
+        SELECT COUNT(*) FROM t_travelgroup_travelitem
+        WHERE travelgroup_id = #{id}
+    </select>
+    <!--根据setmealID查询Group集合-->
+    <select id="findTravelGroupListById" resultMap="findByIdResultMap" parameterType="integer">
+          select * from t_travelgroup where id  in
+          (select travelgroup_id from t_setmeal_travelgroup where setmeal_id=#{id})
+    </select>
+    <resultMap id="findByIdResultMap" type="travelGroup">
+        <id column="id" property="id"></id>
+        <result column="name" property="name"></result>
+        <result column="code" property="code"></result>
+        <result column="helpCode" property="helpCode"></result>
+        <result column="sex" property="sex"></result>
+        <result column="remark" property="remark"></result>
+        <result column="attention" property="attention"></result>
+        <collection property="travelItems" column="id" select="com.lte.dao.TravelItemDao.findTravelItemListById"></collection>
+    </resultMap>
+</mapper>

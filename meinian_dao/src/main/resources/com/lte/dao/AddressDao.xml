@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lte.dao.AddressDao">
+
+    <!--查询所有地址-->
+    <select id="findAllMaps" resultType="address">
+        SELECT * FROM t_address
+    </select>
+    <!--分页查询-->
+    <select id="findPage" parameterType="string" resultType="address">
+        SELECT * FROM t_address
+        <where>
+            <if test="value != null and value.length>0">
+                addressName like concat("%",#{value},"%")
+            </if>
+        </where>
+    </select>
+    <!--添加查询-->
+    <insert id="addAddress" parameterType="address" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_address(addressName,lng,lat) VALUES(#{addressName},#{lng},#{lat})
+    </insert>
+
+    <!--根据ID删除地址-->
+    <delete id="deleteById" parameterType="integer">
+        delete from t_address
+        where id = #{id}
+    </delete>
+</mapper>
